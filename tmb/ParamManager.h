@@ -1,5 +1,5 @@
 //
-//  Settings.h
+//  ParamManager.h
 //
 //  Created by Tim Murray-Browne on 20/02/2013.
 //
@@ -19,7 +19,7 @@ namespace tmb {
 
 class BaseParameter;
 
-class Settings
+class ParamManager
 {
 public:
 	bool load(std::string const& jsonFile);

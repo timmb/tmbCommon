@@ -1,15 +1,14 @@
 //
-//  Settings.cpp
+//  ParamManager.cpp
 //
 //  Created by Tim Murray-Browne on 20/02/2013.
 //
 //
 
+#define CINDER_CINDER
 #ifdef CINDER_CINDER
 
-#include "Settings.h"
-#include "Hud.h"
-#include "Common.h"
+#include "tmb/ParamManager.h"
 #include "cinder/app/AppBasic.h"
 #include "json/json.h"
 #include <fstream>
@@ -20,7 +19,7 @@ using namespace std;
 using namespace ci;
 using namespace tmb;
 
-bool Settings::load(string const& filename)
+bool ParamManager::load(string const& filename)
 {
 	mJsonFile = filename;
 	
@@ -30,29 +29,29 @@ bool Settings::load(string const& filename)
 	try {
 		in >> mRoot;
 	}
-	catch (std::runtime_error& e)
+	catch (std::runtime_error&)
 	{
-		app::console() << "[Settings] Error parsing json file "<<filename<<endl;
+		app::console() << "[ParamManager] Error parsing json file "<<filename<<endl;
 		success = false;
 	}
 	if (success)
 	{
-		app::console() << "[Settings] Successfully loaded "<<filename<<endl;
+		app::console() << "[ParamManager] Successfully loaded "<<filename<<endl;
 	}
 	if (!success)
 	{
-		app::console() << "[Settings] Problem with json file";
+		app::console() << "[ParamManager] Problem with json file";
 	}
 	return success;
 }
 
-void Settings::save()
+void ParamManager::save()
 {
 	save(mJsonFile);
 }
 
 
-void Settings::snapshot()
+void ParamManager::snapshot()
 {
 	// get date string
 	time_t t = time(0);   // get time now
@@ -63,7 +62,7 @@ void Settings::snapshot()
 	save(mJsonFile+buf+".json");
 }
 
-void Settings::save(string const& filename)
+void ParamManager::save(string const& filename)
 {
 	Json::Value root;
 	for (auto it=mParameters.begin(); it!=mParameters.end(); ++it)
@@ -78,20 +77,20 @@ void Settings::save(string const& filename)
 	}
 	catch (...)
 	{
-		app::console() <<"[Settings] Error saving JSON settings file "<<filename<<endl;
+		app::console() <<"[ParamManager] Error saving JSON ParamManager file "<<filename<<endl;
 		if (out.bad()) {
-			app::console() <<"[Settings] Problem with writing file"<<endl;
+			app::console() <<"[ParamManager] Problem with writing file"<<endl;
 		}
 	}
 }
 
 
-void Settings::setup(Vec2i const& paramsSize, string const& paramsTitle)
+void ParamManager::setup(Vec2i const& paramsSize, string const& paramsTitle)
 {
 	mParams = params::InterfaceGl(paramsTitle, paramsSize);
-	mParams.addButton("Save", std::bind((void (Settings::*)())&Settings::save, this));
-	mParams.addButton("Save snapshot", std::bind(&Settings::snapshot, this));
-	for (int i=0; i<mParameters.size(); ++i)
+	mParams.addButton("Save", std::bind((void (ParamManager::*)())&ParamManager::save, this));
+	mParams.addButton("Save snapshot", std::bind(&ParamManager::snapshot, this));
+	for (auto i=0u; i<mParameters.size(); ++i)
 	{
 		mParameters[i]->readJson(mRoot);
 	}
@@ -101,12 +100,12 @@ void Settings::setup(Vec2i const& paramsSize, string const& paramsTitle)
 	}
 }
 
-void Settings::update(float dt, float elapsed)
+void ParamManager::update(float dt, float elapsed)
 {
 
 }
 
-Json::Value Settings::get(string const& path) const
+Json::Value ParamManager::get(string const& path) const
 {
 	// for now, find final /
 	int s = path.find_last_of('/');
@@ -121,13 +120,13 @@ Json::Value Settings::get(string const& path) const
 }
 
 
-void Settings::addParam(std::shared_ptr<BaseParameter> parameter)
+void ParamManager::addParam(std::shared_ptr<BaseParameter> parameter)
 {
 	mParameters.push_back(parameter);
 }
 
 
-void Settings::draw()
+void ParamManager::draw()
 {
 	mParams.draw();
 }
