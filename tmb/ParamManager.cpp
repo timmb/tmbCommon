@@ -203,7 +203,7 @@ namespace tmb
 
 	bool operator>>(Json::Value const& child, std::string& value)
 	{
-		if (!child.isConvertibleTo(Json::realValue))
+		if (!child.isConvertibleTo(Json::stringValue))
 			return false;
 		value = child.asString();
 		return true;
@@ -235,6 +235,65 @@ namespace tmb
 		lhs["y"] = rhs.y;
 		return lhs;
 	}
+
+	bool operator>>(Json::Value const& child, bool& value)
+	{
+		if (!child.isConvertibleTo(Json::booleanValue))
+			return false;
+		value = child.asBool();
+		return true;
+	}
+
+	bool operator>>(Json::Value const& child, unsigned char& value)
+	{
+		if (!child.isConvertibleTo(Json::intValue))
+			return false;
+		int tmp = child.asInt();
+		if (tmp<numeric_limits<char>::min() || tmp>numeric_limits<char>::max())
+			return false;
+		value = tmp;
+		return true;
+	}
+
+
+
+	// ------------
+
+
+	EnumParameter::EnumParameter(int* value_, std::string const& name, std::vector<std::string> const& enumNames, std::string const& path)
+		: Parameter<int>(value_, name, path)
+		, mEnumNames(enumNames)
+	{
+		assert(!mEnumNames.empty());
+	}
+
+	void EnumParameter::setup(ci::params::InterfaceGl& params)
+	{
+		params.addParam(name, mEnumNames, value, "group="+path);
+	}
+
+	void EnumParameter::toJson(Json::Value& child) const
+	{
+		child << mEnumNames.at(*value);
+	}
+
+	bool EnumParameter::fromJson(Json::Value const& child)
+	{
+		std::string tempValue;
+		if (child >> tempValue)
+		{
+			for (auto i=0u; i<mEnumNames.size(); ++i)
+			{
+				if (mEnumNames[i] == tempValue)
+				{
+					*value = i;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 
 }
 #endif
