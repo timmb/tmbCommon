@@ -171,6 +171,14 @@ namespace tmb
 		return true;
 	}
 
+	bool operator>>(Json::Value const& child, double& value)
+	{
+		if (!child.isConvertibleTo(Json::realValue))
+			return false;
+		value = child.asDouble();
+		return true;
+	}
+
 	bool operator>>(Json::Value const& child, int& value)
 	{
 		if (!child.isConvertibleTo(Json::intValue))
@@ -206,6 +214,25 @@ namespace tmb
 		lhs["x"] = rhs.x;
 		lhs["y"] = rhs.y;
 		lhs["z"] = rhs.z;
+		return lhs;
+	}
+
+	bool operator>>(Json::Value const& child, ci::Vec2f& value)
+	{
+		if (child["x"].isConvertibleTo(Json::realValue)
+			&& child["y"].isConvertibleTo(Json::realValue))
+		{
+			value.x = child["x"].asFloat();
+			value.y = child["y"].asFloat();
+			return true;
+		}
+		return false;
+	}
+
+	Json::Value& operator<<(Json::Value& lhs, ci::Vec2f const& rhs)
+	{
+		lhs["x"] = rhs.x;
+		lhs["y"] = rhs.y;
 		return lhs;
 	}
 

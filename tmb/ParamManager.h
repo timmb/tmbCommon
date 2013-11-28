@@ -60,6 +60,7 @@ private:
 
 // To avoid having to specialise the Parameter class
 bool operator>>(Json::Value const& child, float& value);
+bool operator>>(Json::Value const& child, double& value);
 bool operator>>(Json::Value const& child, int& value);
 bool operator>>(Json::Value const& child, std::string& value);
 template <typename T>
@@ -71,6 +72,8 @@ Json::Value& operator<<(Json::Value& lhs, T const& rhs)
 
 bool operator>>(Json::Value const& child, ci::Vec3f& value);
 Json::Value& operator<<(Json::Value& lhs, ci::Vec3f const& rhs);
+bool operator>>(Json::Value const& child, ci::Vec2f& value);
+Json::Value& operator<<(Json::Value& lhs, ci::Vec2f const& rhs);
 
 
 
@@ -100,14 +103,26 @@ protected:
 	virtual bool fromJson(Json::Value const& child) = 0;
 };
 
+
+
+template <typename T>
+T& BaseParameter::getChild(T& root) const
+{
+	if (path=="")
+		return root[name];
+	else
+		return root[path][name];
+}
+
+
 // Main class to represent parameters
 template <typename T>
 class Parameter : public BaseParameter
 {
 public:
-	Parameter(T* value, std::string const& name, std::string const& path)
+	Parameter(T* value_, std::string const& name, std::string const& path)
 	: BaseParameter(name, path)
-	, value(value)
+	, value(value_)
 	{}
 	
 	virtual void setup(ci::params::InterfaceGl& params)
@@ -137,14 +152,43 @@ protected:
 };
 
 
-template <typename T>
-T& BaseParameter::getChild(T& root) const
+// Specialisations
+template <>
+class Parameter<ci::Vec2f> : public BaseParameter
 {
-	if (path=="")
-		return root[name];
-	else
-		return root[path][name];
-}
+public:
+	Parameter(ci::Vec2f* value_, std::string const& name, std::string const& path)
+		: BaseParameter(name, path)
+		, value(value_)
+	{}
+
+	virtual void setup(ci::params::InterfaceGl& params)
+	{
+		params.addParam(path+" "+name+".x", &value->x, "group="+path);
+		params.addParam(path+" "+name+".y", &value->y, "group="+path);
+	}
+
+protected:
+	virtual void toJson(Json::Value& child) const
+	{
+		child << *value;
+	}
+	
+	virtual bool fromJson(Json::Value const& child)
+	{
+		ci::Vec2f tempValue;
+		if (child >> tempValue)
+		{
+			child >> *value;
+			return true;
+		}
+		else
+			return false;
+	}
+
+	ci::Vec2f* value;
+};
+
 
 } // namespace tmb
 
