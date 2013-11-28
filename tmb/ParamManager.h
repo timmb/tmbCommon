@@ -26,7 +26,7 @@ public:
 	/// This needs to be run after load(..). It is separate from load incase
 	/// you want to add further parameters based on the content of the json
 	/// file (accessed using get(..)
-	void setup(ci::Vec2i const& paramsSize=ci::Vec2i(250,400), std::string const& paramsTitle="Settings");
+	void setup(ci::Vec2i const& paramsSize=ci::Vec2i(250,400), ci::Vec2i const& paramsPosition=ci::Vec2i(10, 10), std::string const& paramsTitle="Settings");
 	void save();
 	void save(std::string const& filename);
 	void snapshot();
@@ -48,6 +48,7 @@ private:
 	ci::params::InterfaceGl mParams;
 	std::string mJsonFile;
 	Json::Value mRoot;
+	ci::Vec2i mPosition;
 	
 	std::vector<std::shared_ptr<BaseParameter> > mParameters;
 };
@@ -56,57 +57,15 @@ private:
 
 
 // To avoid having to specialise the Parameter class
-static bool operator>>(Json::Value const& child, float& value)
-{
-	if (!child.isConvertibleTo(Json::realValue))
-		return false;
-	value = child.asFloat();
-	return true;
-}
-
-static bool operator>>(Json::Value const& child, int& value)
-{
-	if (!child.isConvertibleTo(Json::intValue))
-		return false;
-	value = child.asInt();
-	return true;
-}
-
-static bool operator>>(Json::Value const& child, ci::Vec3f& value)
-{
-	if (child["x"].isConvertibleTo(Json::realValue)
-		&& child["y"].isConvertibleTo(Json::realValue)
-		&& child["z"].isConvertibleTo(Json::realValue))
-	{
-		value.x = child["x"].asFloat();
-		value.y = child["y"].asFloat();
-		value.z = child["z"].asFloat();
-		return true;
-	}
-	return false;
-}
-
-static bool operator>>(Json::Value const& child, std::string& value)
-{
-	if (!child.isConvertibleTo(Json::realValue))
-		return false;
-	value = child.asString();
-	return true;
-}
-
+bool operator>>(Json::Value const& child, float& value);
+bool operator>>(Json::Value const& child, int& value);
+bool operator>>(Json::Value const& child, ci::Vec3f& value);
+bool operator>>(Json::Value const& child, std::string& value);
+Json::Value& operator<<(Json::Value& lhs, ci::Vec3f const& rhs);
 template <typename T>
 Json::Value& operator<<(Json::Value& lhs, T const& rhs)
 {
 	lhs = rhs;
-	return lhs;
-}
-
-static
-Json::Value& operator<<(Json::Value& lhs, ci::Vec3f const& rhs)
-{
-	lhs["x"] = rhs.x;
-	lhs["y"] = rhs.y;
-	lhs["z"] = rhs.z;
 	return lhs;
 }
 
