@@ -190,6 +190,49 @@ protected:
 };
 
 
+class EnumParameter : public Parameter<int>
+{
+public:
+	EnumParameter(int* value_, std::string const& name, std::vector<std::string> const& enumNames, std::string const& path)
+	: Parameter<int>(value_, name, path)
+		, mEnumNames(enumNames)
+	{
+		assert(!mEnumNames.empty());
+	}
+
+	virtual void setup(ci::params::InterfaceGl& params)
+	{
+		params.addParam(name, mEnumNames, value, "group="+path);
+	}
+
+protected:
+	virtual void toJson(Json::Value& child) const
+	{
+		child << mEnumNames.at(*value);
+	}
+
+	virtual bool fromJson(Json::Value const& child)
+	{
+		std::string tempValue;
+		if (child >> tempValue)
+		{
+			for (auto i=0u; i<mEnumNames.size(); ++i)
+			{
+				if (mEnumNames[i] == tempValue)
+				{
+					*value = i;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+private:
+	std::vector<std::string> mEnumNames;
+};
+
+
 } // namespace tmb
 
 #endif

@@ -36,8 +36,8 @@ namespace tmb
 		if (midiNote<0 || midiNote>=128)
 			return "?";
 
-		const std::string notes[12] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
-		const std::string octaves[11] =
+		static const std::string notes[12] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
+		static const std::string octaves[11] =
 		{ "0","1","2","3","4","5","6","7","8","9", "10" };
 		return notes[midiNote%12] + octaves[midiNote/12];
 	}
@@ -48,5 +48,11 @@ namespace tmb
 {
 	return radians * 360. / (2. * PI);
 }
+
+	template <typename T, typename U, typename V>
+	T clamp(T const& x, U const& minimum, V const& maximum)
+	{
+		return x<minimum? minimum : x>maximum? maximum : x;
+	}
 	
 }
