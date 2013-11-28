@@ -14,6 +14,8 @@
 #include "cinder/Cinder.h"
 #include <boost/tokenizer.hpp>
 
+
+
 namespace tmb {
 
 
@@ -59,15 +61,17 @@ private:
 // To avoid having to specialise the Parameter class
 bool operator>>(Json::Value const& child, float& value);
 bool operator>>(Json::Value const& child, int& value);
-bool operator>>(Json::Value const& child, ci::Vec3f& value);
 bool operator>>(Json::Value const& child, std::string& value);
-Json::Value& operator<<(Json::Value& lhs, ci::Vec3f const& rhs);
 template <typename T>
 Json::Value& operator<<(Json::Value& lhs, T const& rhs)
 {
 	lhs = rhs;
 	return lhs;
 }
+
+bool operator>>(Json::Value const& child, ci::Vec3f& value);
+Json::Value& operator<<(Json::Value& lhs, ci::Vec3f const& rhs);
+
 
 
 

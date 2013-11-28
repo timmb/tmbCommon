@@ -5,7 +5,9 @@
 //
 //
 
+#ifndef CINDER_CINDER
 #define CINDER_CINDER
+#endif
 #ifdef CINDER_CINDER
 
 #include "tmb/ParamManager.h"
@@ -15,6 +17,7 @@
 #include <iostream>
 #include <ctime>
 #include "cinder/Utilities.h"
+
 
 using namespace std;
 using namespace ci;
