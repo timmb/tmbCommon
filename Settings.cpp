@@ -18,7 +18,7 @@
 
 using namespace std;
 using namespace ci;
-using namespace tmb;
+namespace tmb {
 
 bool Settings::load(string const& filename)
 {
@@ -121,7 +121,7 @@ Json::Value Settings::get(string const& path) const
 }
 
 
-void Settings::addParam(std::shared_ptr<BaseParameter> parameter)
+void Settings::add(std::shared_ptr<BaseParameter> parameter)
 {
 	mParameters.push_back(parameter);
 }
@@ -151,5 +151,5 @@ bool BaseParameter::readJson(Json::Value const& root)
 	return fromJson(child);
 }
 
-
+}
 #endif

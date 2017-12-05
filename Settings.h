@@ -33,11 +33,11 @@ public:
 	void update(float dt, float elapsedTime);
 	void draw();
 	
-	void addParam(std::shared_ptr<BaseParameter> parameter);
+	void add(std::shared_ptr<BaseParameter> parameter);
 	/// Takes ownership of \p parameter
-	void addParam(BaseParameter* parameter)
+	void add(BaseParameter* parameter)
 	{
-		addParam(std::shared_ptr<BaseParameter>(parameter));
+		add(std::shared_ptr<BaseParameter>(parameter));
 	}
 	
 	/// path is slash separated list of key names, e.g.
@@ -117,9 +117,10 @@ class BaseParameter
 public:
 	// path is slash separated
 	// e.g. "" or "triggers" or "triggers/my_trigger/part 1"
-	BaseParameter(std::string const& name, std::string const& path="")
+	BaseParameter(std::string const& name, std::string const& path="", std::string const& antTweakBarOptions="")
 	: path(path)
 	, name(name)
+	, antTweakBarOptions(antTweakBarOptions)
 	{}
 	virtual ~BaseParameter() {}
 	
@@ -131,6 +132,7 @@ public:
 	std::string name;
 	
 protected:
+	std::string antTweakBarOptions;
 	template <typename JsonOrConstJson>
 	JsonOrConstJson& getChild(JsonOrConstJson& root) const;
 	virtual void toJson(Json::Value& child) const = 0;
@@ -142,14 +144,14 @@ template <typename T>
 class Parameter : public BaseParameter
 {
 public:
-	Parameter(T* value, std::string const& name, std::string const& path)
-	: BaseParameter(name, path)
+	Parameter(T* value, std::string const& name, std::string const& path, std::string const& antTweakBarOptions="")
+	: BaseParameter(name, path, antTweakBarOptions)
 	, value(value)
 	{}
 	
 	virtual void setup(ci::params::InterfaceGl& params)
 	{
-		params.addParam(path+" "+name, value, "group="+path);
+		params.addParam(path+" "+name, value, antTweakBarOptions+(path==""?"":" group="+path));
 	}
 	
 protected:

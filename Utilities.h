@@ -35,18 +35,45 @@ namespace tmb
 	{
 		if (midiNote<0 || midiNote>=128)
 			return "?";
-
+		
 		const std::string notes[12] = { "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" };
 		const std::string octaves[11] =
 		{ "0","1","2","3","4","5","6","7","8","9", "10" };
 		return notes[midiNote%12] + octaves[midiNote/12];
 	}
-
-
+	
+	
 	template <typename T>
 	T toDegrees(T const& radians)
-{
-	return radians * 360. / (2. * PI);
-}
+	{
+		return radians * 360. / (2. * PI);
+	}
 	
+	template <typename T>
+	T clamp(T const& x, T const& min=0, T const& max=1)
+	{
+		return x<min? min : x>max? max : x;
+	}
+	
+	//map [0.,1.] to [0,128)
+	// NaN -> 0
+	static int floatTo128(float x)
+	{
+		if (x!=x)
+			return 0;
+		return clamp(int(x*128.f), 0, 127);
+	}
+	
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& out, std::vector<T> const& v)
+{
+	out << '[';
+	typename std::vector<T>::const_iterator it=v.begin();
+	while (it!=v.end())
+	{
+		out << *it++ << (it!=v.end()? ", " : "");
+	}
+	return out << ']';
 }
